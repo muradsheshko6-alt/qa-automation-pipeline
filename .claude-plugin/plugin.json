@@ -1,0 +1,19 @@
+{
+  "name": "qa-automation-pipeline",
+  "version": "1.0.0",
+  "description": "A four-stage pipeline (Site Mapper -> Suite Designer -> Automation Triage -> Automation Engineer) plus a standing external-code-review loop, for turning a live web app into a maintained, CI-ready Playwright/pytest automation suite with full traceability back to a test-case management tool.",
+  "author": {
+    "name": "Mohammad Al Shaish"
+  },
+  "keywords": [
+    "qa",
+    "testing",
+    "automation",
+    "playwright",
+    "pytest",
+    "agents",
+    "coverly",
+    "codex",
+    "code-review"
+  ]
+}

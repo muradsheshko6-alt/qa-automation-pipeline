@@ -1,0 +1,15 @@
+# Secrets and local env (the pipeline keeps real credentials only in a gitignored .env)
+.env
+.env.*
+!.env.example
+
+# Pipeline outputs that may hold account details or site data
+modules_features.json
+*.report.html
+*.report.pdf
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

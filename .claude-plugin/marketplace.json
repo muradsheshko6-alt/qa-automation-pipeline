@@ -1,0 +1,13 @@
+{
+  "name": "qa-automation-pipeline",
+  "owner": {
+    "name": "Mohammad Al Shaish"
+  },
+  "plugins": [
+    {
+      "name": "qa-automation-pipeline",
+      "source": "./",
+      "description": "Four-stage QA automation pipeline (Site Mapper, Suite Designer, Automation Triage, Automation Engineer) plus an external code-review loop, for building a CI-ready Playwright/pytest suite."
+    }
+  ]
+}
