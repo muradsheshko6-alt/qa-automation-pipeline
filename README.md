@@ -1,11 +1,11 @@
 # QA Automation Pipeline (Claude Code plugin)
 
-A four-stage multi-agent pipeline, plus a standing external-code-review loop, for turning a live web app into a maintained, CI-ready Playwright/pytest automation suite with full traceability back to a test-case management tool.
+A five-stage multi-agent pipeline, plus a standing external-code-review loop, for turning a live web app into a maintained, CI-ready Playwright/pytest automation suite with full traceability back to a test-case management tool.
 
 This isn't a single script or prompt — it's a small team of specialized Claude Code subagents, each scoped to one stage, orchestrated by a skill that knows when to dispatch which one and where a human needs to look before the pipeline continues.
 
 ```
-Site Mapper  -->  [human review]  -->  Suite Designer  -->  [human review]  -->  Automation Triage  -->  Automation Engineer  -->  (standing) External Review Loop
+Site Mapper  -->  [human review]  -->  Suite Designer  -->  [human review]  -->  Automation Triage  -->  Automation Engineer  -->  Description Polish  -->  (standing) External Review Loop
 ```
 
 | Stage | What it does | Who does it |
@@ -14,6 +14,7 @@ Site Mapper  -->  [human review]  -->  Suite Designer  -->  [human review]  --> 
 | 2. Suite Designer | Turns the map into structured test cases inside a test-case management tool | Your tool's own AI generator (reference: Coverly) or hand-authored |
 | 3. Automation Triage | Reviews every case against real site constraints, tags what's realistically automatable | `automation-triage` subagent (bundled) |
 | 4. Automation Engineer | Builds the real Playwright + pytest suite, API-first, Page Object Model, dynamic test data, parallel-safe | `automation-engineer` subagent (bundled) |
+| 5. Description Polish | End-of-batch cleanup pass: condenses each case's accumulated Triage/Engineer notes into a short, structured description instead of a run-on wall of text | Whoever's orchestrating (no dedicated subagent needed — it's bookkeeping, not building) |
 | Standing | An external reviewer (reference: Codex) periodically reviews the automation project's own code; findings get verified and fixed | `automation-engineer` again, dispatched against verified findings |
 
 Full orchestration logic, stage-by-stage instructions, and the credential-handling discipline that ties it all together live in [`skills/qa-pipeline/SKILL.md`](skills/qa-pipeline/SKILL.md).

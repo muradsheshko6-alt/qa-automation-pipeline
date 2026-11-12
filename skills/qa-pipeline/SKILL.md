@@ -5,12 +5,12 @@ description: Orchestrates a full QA automation pipeline for a web app -- mapping
 
 # QA Automation Pipeline
 
-This skill orchestrates four build stages plus one standing maintenance loop. It does not do the work itself — it tells you which specialized subagent to dispatch, in what order, with what human checkpoints in between, and how to run the review loop that keeps the resulting suite honest over time.
+This skill orchestrates five build stages plus one standing maintenance loop. It does not do the work itself — it tells you which specialized subagent to dispatch, in what order, with what human checkpoints in between, and how to run the review loop that keeps the resulting suite honest over time.
 
 The stages exist because each one is a genuinely different kind of judgment call, and collapsing them loses something real: mapping a site is reconnaissance, deciding what to automate is a risk/value call, building automation is engineering, and reviewing it later is a different set of eyes. Keep them separate even under time pressure.
 
 ```
-Site Mapper  -->  [human review]  -->  Suite Designer  -->  [human review]  -->  Automation Triage  -->  Automation Engineer  -->  (standing) External Review Loop
+Site Mapper  -->  [human review]  -->  Suite Designer  -->  [human review]  -->  Automation Triage  -->  Automation Engineer  -->  Description Polish  -->  (standing) External Review Loop
 ```
 
 ## Stage 1 — Site Mapper
@@ -40,6 +40,22 @@ A few things worth over-explaining because they matter more than they look:
 - **Never let it mark something `automated` without having actually run it and watched it pass.** A test that compiles but was never executed against the real app is worse than no test — it reports false confidence.
 - **A case that's genuinely blocked should come back blocked, not faked.** If (for example) a password-reset-expiry test can't be verified because the token's real TTL makes waiting impractical and there's no way to shorten or force-expire it, the right outcome is an honest, documented block routed back to triage/dev-team — not a test that doesn't actually test what it claims to.
 - **Bugs found along the way are a feature of this process, not a distraction from it.** Driving the real app end-to-end surfaces real regressions (a stale locator, a config default pointing at a dropdown option that no longer exists, a UI overlay that can't be dismissed) that a human clicking through manually might never hit with enough repetition to notice. Fix what's safely fixable in the test layer; flag anything that's an actual product bug to the people who own that code.
+
+## Stage 5 — Description Polish (end-of-batch, standing)
+
+Most test-case management tools don't expose a separate notes/comments field for this kind of running commentary — only a single `description` string. So across Stages 2-4, each case's description tends to accumulate history: the Suite Designer's one-sentence summary, a Triage rationale, an Automation Engineer implementation-or-blocked note — all appended onto the same field, because appending (never overwriting) is the right call *in the moment*: compressing a note on the fly, mid-run, risks silently losing a real finding under time pressure. Left unpolished across a whole batch, though, this reads as a wall of run-on text — length without structure, not useful density.
+
+Run this as its own pass once a batch of cases has gone all the way through Triage and the Engineer — not folded into either of those stages. For every case touched in the batch:
+
+1. **Read the full current description before touching anything.** Pull everything that's accumulated so far.
+2. **Keep the original one-sentence functional summary essentially as-is** — that's the Suite Designer's claim about what the case verifies, and shouldn't be rewritten into something it didn't say.
+3. **Compress what follows by what kind of case it is, not one universal template:**
+   - **Automated, nothing noteworthy happened:** summary + one line — `Automated: path/to/test.py::test_name (date)`. Drop the rest.
+   - **Automated, but something genuinely worth keeping was found** (a real bug, a locator that needed fixing, a surprising confirmed behavior, a reusable infra note): summary + a short labeled `Finding: ...` line + the automated-pointer line. Keep the finding, cut the narration around it.
+   - **Blocked / left manual:** summary + `Blocked: <the real reason, kept in full>` + `Unblocks when: <the condition that would change the call>`. Don't compress this one hard — the reasoning is the entire value of leaving it unautomated instead of guessing, and it's usually the part someone else needs to act on.
+4. **Never drop information that changes what the next person should do** — an open question for the dev team, a cross-case dependency, a genuine product/security finding surfaced along the way. Cut narration and repetition, not substance.
+5. **Use real line breaks between the summary and each labeled line.** A short list of distinct lines reads entirely differently in a UI than the same content run together as one paragraph, even at the same character count.
+6. **This pass is explicitly allowed to replace**, unlike every earlier stage — you've just read the full history, so overwrite with the polished version rather than appending yet another note on top.
 
 ## Standing: the external code-review loop
 
